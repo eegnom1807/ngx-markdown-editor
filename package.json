@@ -34,5 +34,8 @@
     "@angular/core": "^4.2.5",
     "@angular/forms": "^4.2.5",
     "@angular/platform-browser": "^4.2.5"
+  },
+  "dependencies": {
+    "angular2-emoji-picker": "^1.4.6"
   }
 }

@@ -1,6 +1,7 @@
 import { Component, ViewChild, forwardRef, Renderer, Attribute, Input, ElementRef } from '@angular/core';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor, NG_VALIDATORS, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
+import { CaretEvent, EmojiEvent, EmojiPickerOptions, EmojiPickerAppleSheetLocator } from 'angular2-emoji-picker';
 
 declare let ace: any;
 declare let marked: any;
@@ -25,6 +26,12 @@ declare let hljs: any;
 })
 
 export class MarkdownEditorComponent implements ControlValueAccessor, Validator {
+  public eventMock;
+  public eventPosMock;
+  public toggled = false;
+  public content_emoji: string;
+  private _lastCaretEvent: CaretEvent;
+  public direction = Math.random() > 0.5 ? (Math.random() > 0.5 ? 'top' : 'bottom') : (Math.random() > 0.5 ? 'right' : 'left');
 
   @ViewChild('aceEditor')
   aceEditorContainer: ElementRef;
@@ -219,6 +226,14 @@ export class MarkdownEditorComponent implements ControlValueAccessor, Validator 
         selectedText = "```language\r\n" + (selectedText || initText) + "\r\n```";
         startSize = 3;
         break;
+      case 'Emoji':
+        if (this.content_emoji.length > 0) {
+          let temp = this.content_emoji;
+          this.content_emoji = '';
+          selectedText = temp;
+          selectedText = `${selectedText}`
+        }
+        break;
     }
     this.editor.session.replace(range, selectedText);
     if (!isSeleted) {
@@ -253,4 +268,16 @@ export class MarkdownEditorComponent implements ControlValueAccessor, Validator 
       }, timeOut);
     }
   }
+
+  handleSelection(event: EmojiEvent) {
+    if (event) {
+      this.content_emoji = event.char;
+    }
+  }
+
+  handleCurrentCaret(event: CaretEvent) {
+    this._lastCaretEvent = event;
+    this.eventPosMock = `{ caretOffset : ${event.caretOffset}, caretRange: Range{...}, textContent: ${event.textContent} }`;
+  }
+
 }
